@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="hu" ng-app="csokiApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Csokik</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .csoki-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        .csoki-item {
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+        }
+        .in-stock {
+            background-color: green;
+        }
+        .out-of-stock {
+            background-color: red;
+        }
+    </style>
+</head>
+<body ng-controller="CsokiController">
+
+    <div class="container mt-5">
+        <h1 class="text-center">Csokik</h1>
+
+        <!-- Kereső mező  -->
+        <div class="form-group">
+            <input type="text" class="form-control" ng-model="searchText" placeholder="Keresés csoki neve alapján...">
+        </div>
+
+        
+        <div class="csoki-grid">
+            <div class="csoki-item" ng-repeat="csoki in csokik | filter:searchText" 
+                 ng-class="{'in-stock': csoki.raktaron == 1, 'out-of-stock': csoki.raktaron == 0}">
+                <h3>{{ csoki.nev }}</h3>
+                <p>Ár: {{ csoki.ara }} Ft</p>
+                <p>{{ csoki.raktaron == 1 ? 'Van raktáron' : 'Nincs raktáron' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var app = angular.module('csokiApp', []);       
+        app.controller('CsokiController', ['$scope', '$http', function($scope, $http) {
+            $http.get('csoki.json').then(function(response) {
+                $scope.csokik = response.data;
+                console.log($scope.csokik);
+            }, function(error) {
+                console.error('Hiba történt az adatok betöltésekor:', error);
+            });
+        }]);
+    </script>
+</body>
+</html>
